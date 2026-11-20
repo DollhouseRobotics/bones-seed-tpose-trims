@@ -8,6 +8,13 @@ standing clip. When these clips are retargeted and used as reference motion, the
 overrepresented in the data, and downstream policies learn to drift into T-poses. This manifest lists
 every clip that opens with such a segment and the frame range to keep so the segment is removed.
 
+![Before and after trimming walk_forward_confident_impro_001__A002](media/before_after.gif)
+
+`walk_forward_confident_impro_001__A002` retargeted to the Unitree G1 (from
+`dollhouserobotics/dollhouse-g1-bones-15hrs-basic`), first 7 seconds. Left: the untrimmed clip, which
+holds a calibration T-pose (red) for 2.6 s before the walk starts. Right: the same clip trimmed with this
+manifest, which starts with the walk.
+
 ## Files
 
 | File | Contents |
