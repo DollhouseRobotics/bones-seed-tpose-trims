@@ -21,6 +21,8 @@ manifest, which starts with the walk.
 |---|---|
 | `bones_seed_tpose_trims.csv` | One row per trimmed clip, with the keep range in frames and seconds. |
 | `bones_seed_tpose_trims.json` | The same clips with the detector parameters and per-clip detail (the detected hold and the 30 Hz keep range). |
+| `scripts/` | The detection pipeline that produces both files; see [Reproducing the manifest](#reproducing-the-manifest). |
+| `SHA256SUMS` | Checksums of the two manifest files. |
 
 774 clips are listed: 387 originals and their `_M` mirrors. Together they lose 1,127.5 s (18.8 minutes).
 Clips that are not listed have no opening T-pose to trim and should be used as they are.
@@ -75,6 +77,33 @@ Detected on the SOMA Uniform BVH of
 
 After retargeting, the cuts were also checked in robot space: no trimmed clip in the datasets below still
 starts in a T-pose.
+
+## Reproducing the manifest
+
+The scripts in `scripts/` rebuild both manifest files byte for byte from the BONES-SEED source:
+
+```bash
+pip install -r requirements.txt
+scripts/reproduce.sh work    # needs an HF token with access to bones-studio/seed
+```
+
+`reproduce.sh` runs these steps and ends by checking the outputs against `SHA256SUMS`:
+
+| Step | Script | Output |
+|---|---|---|
+| Download `soma_uniform.tar.gz` (45 GB) at the pinned revision and check its SHA256. | `reproduce.sh` | `work/soma_uniform.tar.gz` |
+| Stream the archive, parse every BVH, run forward kinematics on the spine and arms, and store per-frame T-score, arm elevation and hips position at 120 Hz. | `bvh_features.py` | `work/features/` |
+| Detect calibration T-poses at both ends of every clip, with the strict and relaxed rules above, mirror pairing and class exclusions. | `detect.py` | `work/detections.json` |
+| Keep only the start cuts and write the manifest. | `make_manifest.py` | `work/manifest/` |
+
+End cuts are detected even though they are not applied, because the relaxed rule treats a strict cut
+at one end of a take as evidence that the other end is also a calibration pose. `detections.json`
+keeps the per-clip diagnostics, including why a candidate segment was rejected.
+
+The feature pass is CPU-bound and uses every core. It needs about 60 GB of disk. On a 384-core
+machine the whole run, including the download, took 14 minutes. On 2026-11-20 a from-scratch run reproduced
+both files exactly (the `SHA256SUMS` check passed), and all 142,220 records in `detections.json` matched
+the run that produced the manifest.
 
 ## What is deliberately not trimmed
 
