@@ -132,4 +132,3 @@ datasets on Hugging Face. Each one carries a copy of `bones_seed_tpose_trims.jso
 | `dollhouserobotics/dollhouse-g1-bones-floor` | `c1ba0e56bef7e70fd11a326b13fad6560737ab2b` |
 | `dollhouserobotics/failed-motions` | `7314160ee098f8467bc84cc2eab5764e2a6b007e` |
 
-Produced in [this Amp thread](https://ampcode.com/threads/T-4dcfdeac-17ad-48e0-a789-61cc4b88e33c).
